@@ -206,6 +206,39 @@ Only children with an active check-in (`checked_out_at` is null) are returned.
 
 If no children are currently checked in, the API returns an empty data array and a total count of zero.
 
+### Child Room Assignment Policy
+
+**Decision: Reject duplicate active check-ins.**
+
+A child can be assigned to only one room at a time.
+
+If staff attempt to check in a child who already has an active check-in in another room, the API rejects the request with HTTP `422 Unprocessable Entity`.
+
+Example error:
+
+```json
+{
+    "message": "This child is already checked into a room.",
+    "errors": {
+        "child_id": [
+            "This child is already checked into a room."
+        ]
+    }
+}
+```
+
+**Reasoning:**
+
+- Prevents a child from appearing in multiple rooms simultaneously.
+- Avoids accidental movement of children between rooms.
+- Preserves accurate attendance and check-in/check-out history.
+- Requires staff to explicitly check out a child before assigning them to another room.
+
+This approach prioritizes data consistency, child safety, and predictable staff workflows over automatic room reassignment.
+
+A child can be checked into another room only after their previous active check-in has been closed.
+
+
 ## HTTP Status Codes
 
 | Status | Description |
